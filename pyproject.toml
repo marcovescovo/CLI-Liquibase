@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "liquibase-cli"
+version = "0.1.0"
+description = "Interactive CLI assistant for Liquibase"
+requires-python = ">=3.11"
+dependencies = [
+    "typer>=0.12",
+    "rich>=13",
+    "questionary>=2",
+    "pyyaml>=6",
+    "pydantic>=2",
+    "keyring>=24",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-mock>=3"]
+
+[project.scripts]
+lqb = "lqb.main:app"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lqb"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

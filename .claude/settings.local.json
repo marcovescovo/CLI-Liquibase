@@ -1,0 +1,27 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pip install *)",
+      "Bash(python -m pytest tests/ -v)",
+      "Bash(lqb --help)",
+      "Bash(where liquibase *)",
+      "Bash(java -version)",
+      "Bash(python *)",
+      "Bash(lqb env *)",
+      "Bash(liquibase --version)",
+      "Bash(where /R \"C:\\\\\\\\\" liquibase.bat)",
+      "PowerShell(Get-ChildItem *)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\\" -Filter \"liquibase\" -Recurse -ErrorAction SilentlyContinue -Depth 3 | Where-Object { $_.PSIsContainer } | Select-Object FullName)",
+      "Bash(C:/Program Files/liquibase-secure/liquibase *)",
+      "Bash(\"C:/Program Files/liquibase-secure/liquibase\" --url=\"jdbc:postgresql://localhost:5432/liquibase-test-db\" --username=postgres --changelog-file=db/changelog/db.changelog-master.xml status)",
+      "Bash(echo \"EXIT:$?\")",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:jdbc.postgresql.org)",
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git branch *)",
+      "Bash(git remote *)"
+    ]
+  }
+}

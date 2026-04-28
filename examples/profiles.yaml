@@ -1,0 +1,21 @@
+active: local-pg
+
+profiles:
+  - name: local-pg
+    jdbc_url: jdbc:postgresql://localhost:5432/mydb
+    username: myuser
+    changelog_file: db/changelog.xml
+    default_schema: public
+    protected: false
+
+  - name: staging
+    jdbc_url: jdbc:mysql://staging-host:3306/mydb
+    username: myuser
+    changelog_file: db/changelog.xml
+    protected: false
+
+  - name: production
+    jdbc_url: jdbc:postgresql://prod-host:5432/mydb
+    username: produser
+    changelog_file: db/changelog.xml
+    protected: true
