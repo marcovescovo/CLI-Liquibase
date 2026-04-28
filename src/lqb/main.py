@@ -5,7 +5,7 @@ import shutil
 import typer
 from rich.console import Console
 
-from lqb.commands import dashboard, env, guided, rollback, status, update, validate
+from lqb.commands import dashboard, env, guided, init, rollback, status, update, validate
 
 console = Console()
 
@@ -17,6 +17,7 @@ app = typer.Typer(
 )
 
 app.add_typer(env.app, name="env")
+app.add_typer(init.app, name="init")
 app.add_typer(status.app, name="status")
 app.add_typer(update.app, name="update")
 app.add_typer(rollback.app, name="rollback")

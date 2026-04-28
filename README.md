@@ -10,6 +10,7 @@
 
 `lqb` è una CLI costruita sopra Liquibase OSS che semplifica la gestione delle migrazioni del database. Non sostituisce Liquibase — lo avvolge aggiungendo:
 
+- **Bootstrap assistito** — `lqb init` configura la struttura changelog da zero (DB vuoto) o genera una baseline da uno schema esistente
 - **Profili di connessione** con password salvate nel portachiavi del sistema operativo
 - **Protezione degli ambienti** — gli ambienti contrassegnati come `protected` richiedono una conferma esplicita prima di operazioni distruttive
 - **Builder guidato** interattivo per costruire comandi senza ricordare la sintassi
@@ -76,6 +77,21 @@ lqb env test
 ```
 
 ### Comandi disponibili
+
+#### Bootstrap
+
+```bash
+lqb init                             # wizard interattivo (greenfield o brownfield)
+lqb init --mode greenfield           # DB vuoto: scaffolding struttura changelog
+lqb init --mode brownfield           # DB esistente: genera baseline + changelogSync
+lqb init --env staging --path db/cl  # usa profilo e cartella specificati
+```
+
+**Greenfield** (DB vuoto): crea `db/changelog/db.changelog-master.xml` e la cartella `changes/`, aggiorna il profilo e guida ai passi successivi.
+
+**Brownfield** (DB con schema esistente): esegue `generate-changelog` per catturare lo schema attuale in `baseline.xml`, poi `changelog-sync` per marcarlo come già applicato. Il master XML include la baseline; i changeset futuri vanno aggiunti separatamente.
+
+> **Nota:** `baseline.xml` è uno snapshot dello schema al momento del run — non è riproducibile da zero.
 
 #### Gestione ambienti
 
@@ -178,6 +194,7 @@ profiles:
 
 `lqb` is a CLI built on top of Liquibase OSS that simplifies database migration management. It does not replace Liquibase — it wraps it and adds:
 
+- **Assisted bootstrap** — `lqb init` sets up the changelog structure from scratch (empty DB) or generates a baseline from an existing schema
 - **Connection profiles** with passwords stored in the OS keychain
 - **Environment protection** — profiles marked as `protected` require explicit confirmation before destructive operations
 - **Interactive guided builder** to construct commands without memorising syntax
@@ -244,6 +261,21 @@ lqb env test
 ```
 
 ### Available commands
+
+#### Bootstrap
+
+```bash
+lqb init                             # interactive wizard (greenfield or brownfield)
+lqb init --mode greenfield           # empty DB: scaffold changelog structure
+lqb init --mode brownfield           # existing DB: generate baseline + changelogSync
+lqb init --env staging --path db/cl  # use specific profile and directory
+```
+
+**Greenfield** (empty DB): creates `db/changelog/db.changelog-master.xml` and a `changes/` directory, updates the profile's `changelog_file`, and guides you through next steps.
+
+**Brownfield** (existing DB with schema): runs `generate-changelog` to capture the current schema into `baseline.xml`, then `changelog-sync` to mark it as already applied. The master XML includes the baseline; future changesets are added separately.
+
+> **Note:** `baseline.xml` is a snapshot of the schema at the time of the run — it is not reproducible from scratch.
 
 #### Environment management
 
