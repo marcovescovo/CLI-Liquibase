@@ -153,6 +153,36 @@ lqb do
 
 Modalità interattiva: selezionare il comando, configurare i parametri tramite prompt, vedere il comando risolto e confermare prima dell'esecuzione. Ideale per chi non ricorda la sintassi esatta o vuole un'anteprima SQL integrata.
 
+### Uso in CI (Bamboo, GitHub Actions, GitLab)
+
+In ambienti CI il keychain OS non è disponibile. Fornire la password tramite variabili d'ambiente:
+
+| Variabile | Priorità | Descrizione |
+|---|---|---|
+| `LQB_PASSWORD_<PROFILO>` | alta | Password per profilo specifico (`-` → `_`, uppercase) |
+| `LQB_PASSWORD` | bassa | Fallback generico per qualsiasi profilo |
+| `LQB_NON_INTERACTIVE` | — | Se `1`, disabilita i prompt e fa fallire fast se manca la password |
+
+**Esempio Bamboo** (script task su tag Bitbucket):
+
+```bash
+export LQB_PASSWORD_PRODUCTION="${bamboo.LQB_PASSWORD_PRODUCTION}"
+export LQB_NON_INTERACTIVE=1
+lqb update --env production --yes
+```
+
+**Esempio GitHub Actions**:
+
+```yaml
+- name: Run migrations
+  env:
+    LQB_PASSWORD_PRODUCTION: ${{ secrets.DB_PASSWORD }}
+    LQB_NON_INTERACTIVE: "1"
+  run: lqb update --env production --yes
+```
+
+Profilo `my-db` → variabile `LQB_PASSWORD_MY_DB`. Se né la variabile né il keychain contengono la password e `LQB_NON_INTERACTIVE=1`, il comando fallisce immediatamente con un messaggio che indica quale variabile impostare.
+
 ### Protezione degli ambienti di produzione
 
 I profili con `protected: true` richiedono di digitare il nome del profilo per confermare qualsiasi operazione distruttiva (update, rollback). Questo previene esecuzioni accidentali.
@@ -336,6 +366,36 @@ lqb do
 ```
 
 Interactive mode: select a command, configure parameters via prompts, review the resolved command, and confirm before execution. Ideal for anyone who does not remember exact syntax or wants an integrated SQL preview.
+
+### CI usage (Bamboo, GitHub Actions, GitLab)
+
+The OS keychain is not available in CI environments. Provide the password via environment variables:
+
+| Variable | Priority | Description |
+|---|---|---|
+| `LQB_PASSWORD_<PROFILE>` | high | Password for a specific profile (`-` → `_`, uppercase) |
+| `LQB_PASSWORD` | low | Generic fallback for any profile |
+| `LQB_NON_INTERACTIVE` | — | If `1`, disables prompts and fails fast when password is missing |
+
+**Bamboo example** (script task triggered on Bitbucket tag):
+
+```bash
+export LQB_PASSWORD_PRODUCTION="${bamboo.LQB_PASSWORD_PRODUCTION}"
+export LQB_NON_INTERACTIVE=1
+lqb update --env production --yes
+```
+
+**GitHub Actions example**:
+
+```yaml
+- name: Run migrations
+  env:
+    LQB_PASSWORD_PRODUCTION: ${{ secrets.DB_PASSWORD }}
+    LQB_NON_INTERACTIVE: "1"
+  run: lqb update --env production --yes
+```
+
+Profile `my-db` → variable `LQB_PASSWORD_MY_DB`. If neither the variable nor the keychain contains the password and `LQB_NON_INTERACTIVE=1`, the command exits immediately with a message indicating which variable to set.
 
 ### Production environment protection
 

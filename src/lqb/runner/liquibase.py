@@ -4,6 +4,7 @@ import os
 import platform
 import shutil
 import subprocess
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -22,6 +23,28 @@ class RunResult:
     @property
     def ok(self) -> bool:
         return self.returncode == 0
+
+
+def _resolve_password(profile_name: str, override: str | None) -> str:
+    if override:
+        return override
+    pwd = get_password(profile_name)
+    if pwd is not None:
+        return pwd
+    safe = profile_name.replace("-", "_").upper()
+    pwd = os.environ.get(f"LQB_PASSWORD_{safe}") or os.environ.get("LQB_PASSWORD")
+    if pwd is not None:
+        return pwd
+    non_interactive = os.environ.get("LQB_NON_INTERACTIVE") or not sys.stdin.isatty()
+    if non_interactive:
+        from lqb.ui.tables import err
+        err(
+            f"No password for profile '{profile_name}' in non-interactive mode. "
+            f"Set [bold]LQB_PASSWORD_{safe}[/bold] or [bold]LQB_PASSWORD[/bold]."
+        )
+        raise SystemExit(1)
+    import getpass
+    return getpass.getpass(f"Password for profile '{profile_name}': ")
 
 
 def _find_binary() -> str:
@@ -55,11 +78,7 @@ def run(
     env_extra: dict[str, str] | None = None,
 ) -> RunResult:
     binary = _find_binary()
-
-    pwd = password or get_password(profile.name)
-    if pwd is None:
-        import getpass
-        pwd = getpass.getpass(f"Password for profile '{profile.name}': ")
+    pwd = _resolve_password(profile.name, password)
 
     base_args = [
         binary,
@@ -105,10 +124,7 @@ def run_no_changelog(
 ) -> RunResult:
     """Run a subcommand that doesn't require --changelog-file (e.g. history, list-locks)."""
     binary = _find_binary()
-    pwd = password or get_password(profile.name)
-    if pwd is None:
-        import getpass
-        pwd = getpass.getpass(f"Password for profile '{profile.name}': ")
+    pwd = _resolve_password(profile.name, password)
 
     cmd = [
         binary,
